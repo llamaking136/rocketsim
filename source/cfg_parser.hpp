@@ -25,6 +25,10 @@ bool is_dir(const char* cc);
 
 std::string fileread(std::string filename);
 
+void filewrite(std::string filename, std::string data);
+
+void fileappend(std::string filename, std::string data);
+
 std::vector<std::string> stringtok(std::string data, char by);
 
 CFGFile parse_cfg_file(std::string file);

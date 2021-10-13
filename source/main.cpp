@@ -17,11 +17,9 @@ int main(int argc, const char* argv[]) {
 	Planet earth = {9.807, true, 0.47};
 	Rocket rocket = rocket_from_file(argv[1], earth);
 
-	/*
-	Simulator simulation = {rocket};
+	Simulator simulation = {rocket, 120, 0.01};
 	simulation.run();
 	simulation.outputFile(argv[2]);
-	*/
 
 	return 0;
 }

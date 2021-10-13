@@ -23,12 +23,14 @@ struct Rocket {
 	const char* file_name;
 	double wet_mass;
 	double dry_mass;
+	double mass;
 	double thrust;
 	double isp;
 	double alt;
 	double vel;
 	double burn_time;
 	double duration_time;
+	bool launched;
 	bool landed;
 	bool crashed;
 };

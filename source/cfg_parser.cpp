@@ -38,6 +38,34 @@ std::string fileread(std::string filename) {
 	return data;
 }
 
+void filewrite(std::string filename, std::string data) {
+	std::ofstream file(filename);
+	if (file.fail()) {
+		fatal_error("unable to open file: " + filename + " [errno " + std::to_string(errno) + "]");
+		exit(1);
+	} else if (is_dir(filename.c_str())) {
+		fatal_error("is a directory: " + filename + " [errno 21]");
+		exit(1);
+	}
+	
+	file << data;
+	file.close();
+}
+
+void fileappend(std::string filename, std::string data) {
+	std::ofstream file(filename, std::ios::out | std::ios::app);
+	if (file.fail()) {
+		fatal_error("unable to open file: " + filename + " [errno " + std::to_string(errno) + "]");
+		exit(1);
+	} else if (is_dir(filename.c_str())) {
+		fatal_error("is a directory: " + filename + " [errno 21]");
+		exit(1);
+	}
+	
+	file << data;
+	file.close();
+}
+
 std::vector<std::string> stringtok(std::string data, char by) {
 	std::vector<std::string> result;	
 

@@ -15,6 +15,7 @@
 #include <vector> // do we need these?
 #include "rocket.hpp"
 #include "cfg_parser.hpp"
+#include "simulation.hpp"
 
 int main(int, const char*[]);
 
