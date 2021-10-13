@@ -17,10 +17,12 @@ Simulator::Simulator(Rocket rocket, long duration, double dt) {
 	this->height = new double[(int)this->steps];
 	this->accel = new double[(int)this->steps];
 	this->mass = new double[(int)this->steps];
+	this->thrust = new double[(int)this->steps];
 	this->velocity[0] = 0;
 	this->height[0] = 0;
 	this->accel[0] = 0;
 	this->mass[0] = this->rocket.wet_mass;
+	this->thrust[0] = 0;
 	std::cout << "simulation configured, ready to run\n";
 }
 
@@ -28,24 +30,26 @@ Simulator::~Simulator() {
 	std::cout << "stopping simulation\n";
 	std::cout << "writing to output file " << this->output_file << "\n";
 
-	data_to_csv(this->output_file, "Time,Acceleration,Velocity,Height,Mass", this->actual_steps,
+	data_to_csv(this->output_file, "Time,Acceleration,Velocity,Height,Mass,Thrust", this->actual_steps,
 			this->dt,
 			this->accel,
 			this->velocity,
 			this->height,
-			this->mass);
+			this->mass,
+			this->thrust);
 
 	delete this->velocity;
 	delete this->height;
 	delete this->accel;
 	delete this->mass;
+	delete this->thrust;
 }
 
 void Simulator::run() {
 	std::cout << "running simulation\n";
 	float done_percent = 0.0f;
 	double current_thrust = 0.0;
-	double current_mass = 0.0f;
+	double current_mass = 0.0;
 	this->actual_steps = 0;
 	for (this->current_step = 0; this->current_step <= this->steps; this->current_step++) {
 		this->duration += this->dt;
@@ -59,7 +63,7 @@ void Simulator::run() {
 		}
 
 		// launch
-		if (this->current_step == 0) {
+		if (this->actual_steps == 0) {
 			this->rocket.launched = true;
 			current_thrust = this->rocket.thrust;
 		}
@@ -79,6 +83,7 @@ void Simulator::run() {
 		this->velocity[this->current_step + 1] = this->velocity[this->current_step] + (this->accel[this->current_step + 1] + -this->rocket.planet.gravity) * this->dt;
 		this->height[this->current_step + 1] = this->height[this->current_step] + this->velocity[this->current_step + 1];
 		this->mass[this->current_step + 1] = current_mass;
+		this->thrust[this->current_step + 1] = current_thrust;
 
 		done_percent = round_to_two((this->current_step / this->steps) * 100);
 		std::cout << "done percent: " << done_percent << "\r";
@@ -114,12 +119,12 @@ float round_to_two(float var)
     return (float)value / 100;
 }
 
-void data_to_csv(std::string filename, std::string header, unsigned long size, double one, double* two, double* three, double* four, double* five) {
+void data_to_csv(std::string filename, std::string header, unsigned long size, double one, double* two, double* three, double* four, double* five, double* six) {
 	filewrite(filename, header + "\n");
 	double time = 0.0;
 	for (unsigned long i = 0; i < size; i++) {
 		time += one;
-		fileappend(filename, std::to_string(time) + "," + std::to_string(two[i]) + "," + std::to_string(three[i]) + "," + std::to_string(four[i]) + "," + std::to_string(five[i]) + "\n");
+		fileappend(filename, std::to_string(time) + "," + std::to_string(two[i]) + "," + std::to_string(three[i]) + "," + std::to_string(four[i]) + "," + std::to_string(five[i]) + "," + std::to_string(six[i]) + "\n");
 	}
 	std::cout << "finished writing output file " << filename << "\n";
 }

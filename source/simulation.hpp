@@ -23,6 +23,7 @@ private:
 	double* height;
 	double* accel;
 	double* mass;
+	double* thrust;
 	unsigned long steps;
 	unsigned long current_step;
 	unsigned long actual_steps;
@@ -41,7 +42,7 @@ float round_to_two(float var);
 
 bool engine_running(double duration, double dt);
 
-void data_to_csv(std::string filename, std::string header, unsigned long size, double one, double* two, double* three, double* four, double* five);
+void data_to_csv(std::string filename, std::string header, unsigned long size, double one, double* two, double* three, double* four, double* five, double* six);
 
 double get_acceleration(double thrust, double mass);
 
