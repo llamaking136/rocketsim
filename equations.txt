@@ -1,4 +1,4 @@
 steps = duration / dt
 acceleration = motor thrust / rocket mass
-velocity = previous velocity + ((accel + gravity(-9.807)) * dt)
+velocity = previous velocity + ((accel + gravity) * dt)
 height = previous height + velocity * dt

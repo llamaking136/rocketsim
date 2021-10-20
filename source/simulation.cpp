@@ -49,23 +49,27 @@ void Simulator::run() {
 	std::cout << "running simulation\n";
 	float done_percent = 0.0f;
 	double current_thrust = 0.0;
+	double last_thrust = 0.0;
 	double current_mass = 0.0;
+	double temp_thrust = 0.0;
 	this->actual_steps = 0;
 	for (this->current_step = 0; this->current_step <= this->steps; this->current_step++) {
 		this->duration += this->dt;
 		this->rocket.duration_time = this->duration;
 
 		// ded
+		/*
 		if (this->actual_steps != 0) {
 			if (this->height[this->current_step - 1] < 0) {
 				break;
 			}
 		}
+		*/
 
 		// launch
 		if (this->actual_steps == 0) {
 			this->rocket.launched = true;
-			current_thrust = this->rocket.thrust;
+			current_thrust = this->rocket.thrust.begin()->second;
 		}
 		// burnout
 		if (!engine_running(this->rocket.burn_time, this->duration) && this->rocket.launched) {
@@ -76,17 +80,23 @@ void Simulator::run() {
 		// powered flight
 		if (engine_running(this->rocket.burn_time, this->duration) && this->rocket.launched) {
 			current_mass = get_rocket_mass_during_burn(this->rocket.burn_time, this->duration, this->rocket.wet_mass, this->rocket.dry_mass);
+			temp_thrust = get_rocket_thrust_curve(this->rocket.burn_time, this->duration, this->rocket.thrust);
+			if (temp_thrust != DBL_MAX) {
+				last_thrust = temp_thrust;
+			}
+			current_thrust = last_thrust;
 		}
 
 
 		this->accel[this->current_step + 1] = current_thrust / current_mass;
-		this->velocity[this->current_step + 1] = this->velocity[this->current_step] + (this->accel[this->current_step + 1] + -this->rocket.planet.gravity) * this->dt;
-		this->height[this->current_step + 1] = this->height[this->current_step] + this->velocity[this->current_step + 1];
+		this->velocity[this->current_step + 1] = this->velocity[this->current_step] + ((this->accel[this->current_step + 1] + -this->rocket.planet.gravity) * this->dt);
+		this->height[this->current_step + 1] = this->height[this->current_step] + this->velocity[this->current_step + 1] * this->dt;
 		this->mass[this->current_step + 1] = current_mass;
 		this->thrust[this->current_step + 1] = current_thrust;
 
 		done_percent = round_to_two((this->current_step / this->steps) * 100);
-		std::cout << "done percent: " << done_percent << "\r";
+		// std::cout << "done percent: " << done_percent << "\r";
+		// std::cout << this->rocket.launched << "\n";
 		this->actual_steps++;
 	}
 }
@@ -100,6 +110,16 @@ double get_rocket_mass_during_burn(double burn_time, double time, double wet_mas
 	return wet_mass - ((wet_mass - dry_mass) * (time / burn_time));
 }
 
+double get_rocket_thrust_curve(double burn_time, double time, ThrustCurve curve) {
+	if (time > burn_time) {
+		std::cout << "not regular\n";
+		return DBL_MAX;
+	}
+	
+	std::cout << (curve[time] == 0 ? "also not " : "maybe ") << "regular\n";
+	return curve[time];
+}
+
 bool engine_running(double duration, double dt) { // XXX: rename dt to something else, it isn't ∆t
 	// engine ignition is usually 0 on dt, so i think it'll work
 	if (dt > duration) {
@@ -108,6 +128,39 @@ bool engine_running(double duration, double dt) { // XXX: rename dt to something
 		return true;
 	}
 }
+
+/*
+template <typename BidirectionalIterator, typename T>
+BidirectionalIterator getClosest(BidirectionalIterator first, 
+                                 BidirectionalIterator last, 
+                                 const T & value)
+{
+    BidirectionalIterator before = std::lower_bound(first, last, value);
+
+    if (before == first) return first;
+    if (before == last)  return --last; // iterator must be bidirectional
+
+    BidirectionalIterator after = before;
+    --before;
+
+    return (*after - value) < (value - *before) ? after : before;
+}
+
+template <typename BidirectionalIterator, typename T>
+std::size_t getClosestIndex(BidirectionalIterator first, 
+                            BidirectionalIterator last, 
+                            const T & value)
+{
+    return std::distance(first, getClosest(first, last, value));
+}
+
+int getPositionOfLevel(double level, std::vector<double> arr)
+{
+    double array[arr.size()];
+	std::copy(arr.begin(), arr.end(), array);
+	return getClosestIndex(array, array + arr.size(), level);
+}
+*/
 
 float round_to_two(float var)
 {

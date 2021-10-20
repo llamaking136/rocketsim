@@ -10,6 +10,7 @@
 #define ROCKET_HPP
 
 #include "cfg_parser.hpp"
+#include "csv_parser.hpp"
 
 struct Planet {
 	double gravity;
@@ -24,7 +25,7 @@ struct Rocket {
 	double wet_mass;
 	double dry_mass;
 	double mass;
-	double thrust;
+	ThrustCurve thrust;
 	double isp;
 	double alt;
 	double vel;
@@ -36,5 +37,7 @@ struct Rocket {
 };
 
 Rocket rocket_from_file(const char* file, Planet planet);
+
+ThrustCurve load_thrust_curve_from_csv(std::string filename);
 
 #endif // ROCKET_HPP

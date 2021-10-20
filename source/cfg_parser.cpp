@@ -100,5 +100,7 @@ CFGFile parse_cfg_file(std::string file) {
 		result[key] = value;
 	}
 
+	std::cout << "loaded cfg file " << file << "\n";
+
 	return result;
 }

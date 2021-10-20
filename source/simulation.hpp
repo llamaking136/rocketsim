@@ -12,7 +12,9 @@
 #include <string>
 #include <iostream>
 #include "cfg_parser.hpp"
+#include "csv_parser.hpp"
 #include "rocket.hpp"
+#include <cfloat>
 
 class Simulator {
 private:
@@ -37,6 +39,8 @@ public:
 };
 
 double get_rocket_mass_during_burn(double burn_time, double time, double wet_mass, double dry_mass);
+
+double get_rocket_thrust_curve(double burn_time, double time, ThrustCurve curve);
 
 float round_to_two(float var);
 
